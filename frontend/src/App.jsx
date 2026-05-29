@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Send, Loader2 } from 'lucide-react';
 
-const BACKEND_URL = 'http://localhost:4000';
+const BACKEND_URL = 'https://mercedes-chatbot-1.onrender.com';
 
 const EXAMPLE_QUESTIONS = [
   "Which country has the lowest base price?",
