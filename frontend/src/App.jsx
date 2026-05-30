@@ -1,7 +1,371 @@
+// import { useState, useRef, useEffect } from 'react';
+// import { Send, Loader2 } from 'lucide-react';
+
+// const BACKEND_URL = 'https://mercedes-chatbot-1.onrender.com';
+
+// const EXAMPLE_QUESTIONS = [
+//   "Which country has the lowest base price?",
+//   "Compare base prices across all 5 countries",
+//   "What battery options are available?",
+//   "Cheapest configuration in Germany?",
+//   "What's the VAT rate for each country?",
+//   "Which packages are free (standard) in Germany?",
+//   "What roof types are available and where?",
+//   "How many total combinations exist across all countries?",
+//   "What colors are available at no extra cost?",
+//   "Is the high roof available in Spain?",
+// ];
+
+// export default function App() {
+//   const [messages, setMessages] = useState([
+//     {
+//       role: 'assistant',
+//       content: "Hello! I'm your Mercedes eSprinter configurator analyst. I have data on all valid combinations across France, Italy, Spain, Germany, and the UK — covering batteries, motors, lines, colors, packages, and pricing. What would you like to know?"
+//     }
+//   ]);
+//   const [input, setInput] = useState('');
+//   const [isLoading, setIsLoading] = useState(false);
+//   const [chips, setChips] = useState(EXAMPLE_QUESTIONS.slice(0, 4));
+//   const [showChips, setShowChips] = useState(true);
+//   const messagesEndRef = useRef(null);
+//   const inputRef = useRef(null);
+
+//   useEffect(() => {
+//     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+//   }, [messages]);
+
+//   const rotateChips = () => {
+//     const shuffled = [...EXAMPLE_QUESTIONS].sort(() => Math.random() - 0.5);
+//     setChips(shuffled.slice(0, 4));
+//   };
+
+//   const sendMessage = async (text) => {
+//     const query = (text || input).trim();
+//     if (!query || isLoading) return;
+
+//     setInput('');
+//     setShowChips(false);
+//     setIsLoading(true);
+
+//     const userMsg = { role: 'user', content: query };
+//     const updatedHistory = [...messages, userMsg];
+//     setMessages(updatedHistory);
+
+//     try {
+//       const response = await fetch(`${BACKEND_URL}/api/chat`, {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify({
+//           messages: updatedHistory.map(m => ({
+//             role: m.role,
+//             content: m.content
+//           }))
+//         })
+//       });
+
+//       if (!response.ok) throw new Error(`Server error: ${response.status}`);
+
+//       const data = await response.json();
+//       const answer = data.answer || 'Sorry, I could not generate a response.';
+
+//       setMessages(prev => [...prev, { role: 'assistant', content: answer }]);
+//       rotateChips();
+//       setShowChips(true);
+//     } catch (err) {
+//       console.error(err);
+//       setMessages(prev => [
+//         ...prev,
+//         {
+//           role: 'assistant',
+//           content: '⚠️ Could not connect to the server. Make sure the backend is running on port 4000.',
+//           error: true
+//         }
+//       ]);
+//     } finally {
+//       setIsLoading(false);
+//       inputRef.current?.focus();
+//     }
+//   };
+
+//   const handleKeyDown = (e) => {
+//     if (e.key === 'Enter' && !e.shiftKey) {
+//       e.preventDefault();
+//       sendMessage();
+//     }
+//   };
+
+//   return (
+//     <div style={{
+//       minHeight: '100vh',
+//       background: '#EEEDFE',
+//       display: 'flex',
+//       alignItems: 'center',
+//       justifyContent: 'center',
+//       padding: '20px',
+//       fontFamily: 'system-ui, -apple-system, sans-serif'
+//     }}>
+//       <div style={{
+//         width: '100%',
+//         maxWidth: '760px',
+//         height: '88vh',
+//         background: '#fff',
+//         borderRadius: '16px',
+//         boxShadow: '0 8px 40px rgba(83,74,183,0.15)',
+//         display: 'flex',
+//         flexDirection: 'column',
+//         overflow: 'hidden'
+//       }}>
+
+//         {/* Header */}
+//         <div style={{
+//           background: '#534AB7',
+//           padding: '18px 24px',
+//           display: 'flex',
+//           alignItems: 'center',
+//           gap: '14px',
+//           flexShrink: 0
+//         }}>
+//           <div style={{
+//             fontSize: '28px',
+//             fontWeight: 700,
+//             color: 'rgba(255,255,255,0.2)',
+//             lineHeight: 1,
+//             userSelect: 'none'
+//           }}>#</div>
+//           <div>
+//             <h1 style={{ margin: 0, fontSize: '16px', fontWeight: 600, color: '#fff', letterSpacing: '0.03em' }}>
+//               INSTADATA.WORKS
+//             </h1>
+//             <p style={{ margin: '3px 0 0', fontSize: '12px', color: 'rgba(255,255,255,0.65)' }}>
+//               Mercedes eSprinter — Configurator Intelligence
+//             </p>
+//           </div>
+//           <div style={{
+//             marginLeft: 'auto',
+//             display: 'flex',
+//             alignItems: 'center',
+//             gap: '7px',
+//             background: 'rgba(255,255,255,0.12)',
+//             border: '0.5px solid rgba(255,255,255,0.25)',
+//             borderRadius: '20px',
+//             padding: '5px 13px',
+//             fontSize: '12px',
+//             color: 'rgba(255,255,255,0.85)'
+//           }}>
+//             <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#5DCAA5' }} />
+//             AI ready
+//           </div>
+//         </div>
+
+//         {/* Messages */}
+//         <div style={{
+//           flex: 1,
+//           overflowY: 'auto',
+//           padding: '24px 20px 16px',
+//           display: 'flex',
+//           flexDirection: 'column',
+//           gap: '16px',
+//           background: '#F7F6FF'
+//         }}>
+//           {messages.map((msg, i) => (
+//             <div key={i} style={{
+//               display: 'flex',
+//               justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
+//               alignItems: 'flex-end',
+//               gap: '10px'
+//             }}>
+//               {msg.role === 'assistant' && (
+//                 <div style={{
+//                   width: 30, height: 30, borderRadius: '50%',
+//                   background: '#534AB7', color: '#fff',
+//                   display: 'flex', alignItems: 'center', justifyContent: 'center',
+//                   fontSize: '11px', fontWeight: 600, flexShrink: 0
+//                 }}>AI</div>
+//               )}
+
+//               <div style={{
+//                 maxWidth: '75%',
+//                 padding: '11px 15px',
+//                 borderRadius: msg.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+//                 background: msg.role === 'user'
+//                   ? '#534AB7'
+//                   : msg.error ? '#FCEBEB' : '#fff',
+//                 color: msg.role === 'user'
+//                   ? '#fff'
+//                   : msg.error ? '#A32D2D' : '#1a1a2e',
+//                 fontSize: '14px',
+//                 lineHeight: '1.65',
+//                 border: msg.role === 'assistant' && !msg.error
+//                   ? '0.5px solid #CECBF6'
+//                   : msg.error ? '0.5px solid #F09595' : 'none',
+//                 whiteSpace: 'pre-wrap',
+//                 wordBreak: 'break-word'
+//               }}>
+//                 {msg.content}
+//               </div>
+
+//               {msg.role === 'user' && (
+//                 <div style={{
+//                   width: 30, height: 30, borderRadius: '50%',
+//                   background: '#AFA9EC', color: '#26215C',
+//                   display: 'flex', alignItems: 'center', justifyContent: 'center',
+//                   fontSize: '11px', fontWeight: 600, flexShrink: 0
+//                 }}>You</div>
+//               )}
+//             </div>
+//           ))}
+
+//           {/* Thinking indicator */}
+//           {isLoading && (
+//             <div style={{ display: 'flex', alignItems: 'flex-end', gap: '10px' }}>
+//               <div style={{
+//                 width: 30, height: 30, borderRadius: '50%',
+//                 background: '#534AB7', color: '#fff',
+//                 display: 'flex', alignItems: 'center', justifyContent: 'center',
+//                 fontSize: '11px', fontWeight: 600, flexShrink: 0
+//               }}>AI</div>
+//               <div style={{
+//                 padding: '12px 16px',
+//                 background: '#fff',
+//                 border: '0.5px solid #CECBF6',
+//                 borderRadius: '16px 16px 16px 4px',
+//                 display: 'flex', gap: '5px', alignItems: 'center'
+//               }}>
+//                 {[0, 0.2, 0.4].map((delay, i) => (
+//                   <div key={i} style={{
+//                     width: 7, height: 7, borderRadius: '50%',
+//                     background: '#7F77DD',
+//                     animation: 'blink 1.2s ease-in-out infinite',
+//                     animationDelay: `${delay}s`
+//                   }} />
+//                 ))}
+//               </div>
+//             </div>
+//           )}
+
+//           <div ref={messagesEndRef} />
+//         </div>
+
+//         {/* Suggestion chips */}
+//         {showChips && (
+//           <div style={{
+//             padding: '10px 20px 6px',
+//             display: 'flex',
+//             gap: '8px',
+//             flexWrap: 'wrap',
+//             background: '#F7F6FF',
+//             borderTop: '0.5px solid #CECBF6'
+//           }}>
+//             {chips.map((q, i) => (
+//               <button key={i} onClick={() => sendMessage(q)} style={{
+//                 background: '#fff',
+//                 border: '0.5px solid #AFA9EC',
+//                 color: '#534AB7',
+//                 borderRadius: '20px',
+//                 padding: '5px 13px',
+//                 fontSize: '12px',
+//                 cursor: 'pointer',
+//                 fontFamily: 'inherit',
+//                 transition: 'all 0.15s'
+//               }}
+//                 onMouseEnter={e => {
+//                   e.target.style.background = '#EEEDFE';
+//                   e.target.style.borderColor = '#534AB7';
+//                 }}
+//                 onMouseLeave={e => {
+//                   e.target.style.background = '#fff';
+//                   e.target.style.borderColor = '#AFA9EC';
+//                 }}
+//               >
+//                 {q}
+//               </button>
+//             ))}
+//           </div>
+//         )}
+
+//         {/* Input bar */}
+//         <div style={{
+//           padding: '14px 20px',
+//           background: '#fff',
+//           borderTop: '0.5px solid #CECBF6',
+//           display: 'flex',
+//           gap: '10px',
+//           alignItems: 'flex-end'
+//         }}>
+//           <textarea
+//             ref={inputRef}
+//             value={input}
+//             onChange={e => {
+//               setInput(e.target.value);
+//               e.target.style.height = 'auto';
+//               e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
+//             }}
+//             onKeyDown={handleKeyDown}
+//             placeholder="Ask anything about the eSprinter configurator data…"
+//             disabled={isLoading}
+//             rows={1}
+//             style={{
+//               flex: 1,
+//               border: '0.5px solid #CECBF6',
+//               borderRadius: '10px',
+//               padding: '10px 14px',
+//               fontSize: '14px',
+//               fontFamily: 'inherit',
+//               resize: 'none',
+//               minHeight: '42px',
+//               maxHeight: '120px',
+//               background: '#F7F6FF',
+//               color: '#1a1a2e',
+//               outline: 'none',
+//               transition: 'border-color 0.15s',
+//               lineHeight: '1.5'
+//             }}
+//             onFocus={e => e.target.style.borderColor = '#534AB7'}
+//             onBlur={e => e.target.style.borderColor = '#CECBF6'}
+//           />
+//           <button
+//             onClick={() => sendMessage()}
+//             disabled={!input.trim() || isLoading}
+//             style={{
+//               width: 42, height: 42,
+//               borderRadius: '10px',
+//               background: input.trim() && !isLoading ? '#534AB7' : '#AFA9EC',
+//               border: 'none',
+//               cursor: input.trim() && !isLoading ? 'pointer' : 'not-allowed',
+//               display: 'flex', alignItems: 'center', justifyContent: 'center',
+//               flexShrink: 0,
+//               transition: 'background 0.15s, transform 0.1s'
+//             }}
+//             onMouseEnter={e => { if (input.trim() && !isLoading) e.target.style.background = '#3C3489'; }}
+//             onMouseLeave={e => { if (input.trim() && !isLoading) e.target.style.background = '#534AB7'; }}
+//             onMouseDown={e => e.currentTarget.style.transform = 'scale(0.95)'}
+//             onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
+//           >
+//             {isLoading
+//               ? <Loader2 size={18} color="#fff" style={{ animation: 'spin 1s linear infinite' }} />
+//               : <Send size={18} color="#fff" />
+//             }
+//           </button>
+//         </div>
+//       </div>
+
+//       <style>{`
+//         @keyframes blink { 0%,80%,100% { opacity: 0.2; } 40% { opacity: 1; } }
+//         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+//         * { box-sizing: border-box; }
+//         body { margin: 0; }
+//         ::-webkit-scrollbar { width: 4px; }
+//         ::-webkit-scrollbar-track { background: transparent; }
+//         ::-webkit-scrollbar-thumb { background: #CECBF6; border-radius: 2px; }
+//       `}</style>
+//     </div>
+//   );
+// }
+
 import { useState, useRef, useEffect } from 'react';
 import { Send, Loader2 } from 'lucide-react';
 
-const BACKEND_URL = 'https://mercedes-chatbot-1.onrender.com';
+const BACKEND_URL = 'https://mercedes-chatbot-1.onrender.com'; // replace with your Render URL
 
 const EXAMPLE_QUESTIONS = [
   "Which country has the lowest base price?",
@@ -14,6 +378,11 @@ const EXAMPLE_QUESTIONS = [
   "How many total combinations exist across all countries?",
   "What colors are available at no extra cost?",
   "Is the high roof available in Spain?",
+  "What's the anti-theft package cost in Spain?",
+  "What's the range of the 56 kWh battery in Italy?",
+  "What's the payload capacity of the eSprinter 314?",
+  "Which country has the most configurations available?",
+  "Compare metallic color surcharges across countries",
 ];
 
 export default function App() {
@@ -77,7 +446,7 @@ export default function App() {
         ...prev,
         {
           role: 'assistant',
-          content: '⚠️ Could not connect to the server. Make sure the backend is running on port 4000.',
+          content: '⚠️ Could not connect to the server. Make sure the backend is running.',
           error: true
         }
       ]);
@@ -97,7 +466,7 @@ export default function App() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: '#EEEDFE',
+      background: '#E8E8F5',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -110,7 +479,7 @@ export default function App() {
         height: '88vh',
         background: '#fff',
         borderRadius: '16px',
-        boxShadow: '0 8px 40px rgba(83,74,183,0.15)',
+        boxShadow: '0 8px 40px rgba(123,127,196,0.18)',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden'
@@ -118,42 +487,64 @@ export default function App() {
 
         {/* Header */}
         <div style={{
-          background: '#534AB7',
-          padding: '18px 24px',
+          background: '#7B7FC4',
+          padding: '16px 24px',
           display: 'flex',
           alignItems: 'center',
-          gap: '14px',
+          justifyContent: 'space-between',
           flexShrink: 0
         }}>
+          {/* Left — AI ready badge */}
           <div style={{
-            fontSize: '28px',
-            fontWeight: 700,
-            color: 'rgba(255,255,255,0.2)',
-            lineHeight: 1,
-            userSelect: 'none'
-          }}>#</div>
-          <div>
-            <h1 style={{ margin: 0, fontSize: '16px', fontWeight: 600, color: '#fff', letterSpacing: '0.03em' }}>
-              INSTADATA.WORKS
-            </h1>
-            <p style={{ margin: '3px 0 0', fontSize: '12px', color: 'rgba(255,255,255,0.65)' }}>
-              Mercedes eSprinter — Configurator Intelligence
-            </p>
-          </div>
-          <div style={{
-            marginLeft: 'auto',
             display: 'flex',
             alignItems: 'center',
             gap: '7px',
-            background: 'rgba(255,255,255,0.12)',
-            border: '0.5px solid rgba(255,255,255,0.25)',
+            background: 'rgba(255,255,255,0.18)',
+            border: '0.5px solid rgba(255,255,255,0.3)',
             borderRadius: '20px',
-            padding: '5px 13px',
+            padding: '6px 14px',
             fontSize: '12px',
-            color: 'rgba(255,255,255,0.85)'
+            color: '#fff'
           }}>
-            <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#5DCAA5' }} />
-            AI ready
+            <div style={{
+              width: 7,
+              height: 7,
+              borderRadius: '50%',
+              background: '#5DCAA5'
+            }} />
+            AI Assistant
+          </div>
+
+          {/* Right — Logo */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            position: 'relative'
+          }}>
+            <span style={{
+              fontSize: '32px',
+              fontWeight: 900,
+              color: 'rgba(255,255,255,0.2)',
+              lineHeight: 1,
+              userSelect: 'none',
+              marginRight: '4px'
+            }}>#</span>
+            <div style={{ lineHeight: 1.1 }}>
+              <div style={{
+                fontSize: '15px',
+                fontWeight: 900,
+                color: '#1a1a2e',
+                letterSpacing: '0.04em'
+              }}>INSTADATA</div>
+              <div style={{
+                fontSize: '15px',
+                fontWeight: 900,
+                color: '#1a1a2e',
+                letterSpacing: '0.04em'
+              }}>.WORKS</div>
+              
+            </div>
           </div>
         </div>
 
@@ -165,7 +556,7 @@ export default function App() {
           display: 'flex',
           flexDirection: 'column',
           gap: '16px',
-          background: '#F7F6FF'
+          background: '#F2F2F9'
         }}>
           {messages.map((msg, i) => (
             <div key={i} style={{
@@ -176,19 +567,28 @@ export default function App() {
             }}>
               {msg.role === 'assistant' && (
                 <div style={{
-                  width: 30, height: 30, borderRadius: '50%',
-                  background: '#534AB7', color: '#fff',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '11px', fontWeight: 600, flexShrink: 0
+                  width: 30,
+                  height: 30,
+                  borderRadius: '50%',
+                  background: '#7B7FC4',
+                  color: '#fff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  flexShrink: 0
                 }}>AI</div>
               )}
 
               <div style={{
                 maxWidth: '75%',
                 padding: '11px 15px',
-                borderRadius: msg.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                borderRadius: msg.role === 'user'
+                  ? '16px 16px 4px 16px'
+                  : '16px 16px 16px 4px',
                 background: msg.role === 'user'
-                  ? '#534AB7'
+                  ? '#7B7FC4'
                   : msg.error ? '#FCEBEB' : '#fff',
                 color: msg.role === 'user'
                   ? '#fff'
@@ -196,7 +596,7 @@ export default function App() {
                 fontSize: '14px',
                 lineHeight: '1.65',
                 border: msg.role === 'assistant' && !msg.error
-                  ? '0.5px solid #CECBF6'
+                  ? '0.5px solid #C5C7E8'
                   : msg.error ? '0.5px solid #F09595' : 'none',
                 whiteSpace: 'pre-wrap',
                 wordBreak: 'break-word'
@@ -206,10 +606,17 @@ export default function App() {
 
               {msg.role === 'user' && (
                 <div style={{
-                  width: 30, height: 30, borderRadius: '50%',
-                  background: '#AFA9EC', color: '#26215C',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '11px', fontWeight: 600, flexShrink: 0
+                  width: 30,
+                  height: 30,
+                  borderRadius: '50%',
+                  background: '#B8BBE8',
+                  color: '#2e2e5e',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  flexShrink: 0
                 }}>You</div>
               )}
             </div>
@@ -219,22 +626,33 @@ export default function App() {
           {isLoading && (
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: '10px' }}>
               <div style={{
-                width: 30, height: 30, borderRadius: '50%',
-                background: '#534AB7', color: '#fff',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '11px', fontWeight: 600, flexShrink: 0
+                width: 30,
+                height: 30,
+                borderRadius: '50%',
+                background: '#7B7FC4',
+                color: '#fff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '11px',
+                fontWeight: 600,
+                flexShrink: 0
               }}>AI</div>
               <div style={{
                 padding: '12px 16px',
                 background: '#fff',
-                border: '0.5px solid #CECBF6',
+                border: '0.5px solid #C5C7E8',
                 borderRadius: '16px 16px 16px 4px',
-                display: 'flex', gap: '5px', alignItems: 'center'
+                display: 'flex',
+                gap: '5px',
+                alignItems: 'center'
               }}>
                 {[0, 0.2, 0.4].map((delay, i) => (
                   <div key={i} style={{
-                    width: 7, height: 7, borderRadius: '50%',
-                    background: '#7F77DD',
+                    width: 7,
+                    height: 7,
+                    borderRadius: '50%',
+                    background: '#7B7FC4',
                     animation: 'blink 1.2s ease-in-out infinite',
                     animationDelay: `${delay}s`
                   }} />
@@ -249,32 +667,35 @@ export default function App() {
         {/* Suggestion chips */}
         {showChips && (
           <div style={{
-            padding: '10px 20px 6px',
+            padding: '10px 20px 8px',
             display: 'flex',
             gap: '8px',
             flexWrap: 'wrap',
-            background: '#F7F6FF',
-            borderTop: '0.5px solid #CECBF6'
+            background: '#F2F2F9',
+            borderTop: '0.5px solid #C5C7E8'
           }}>
             {chips.map((q, i) => (
-              <button key={i} onClick={() => sendMessage(q)} style={{
-                background: '#fff',
-                border: '0.5px solid #AFA9EC',
-                color: '#534AB7',
-                borderRadius: '20px',
-                padding: '5px 13px',
-                fontSize: '12px',
-                cursor: 'pointer',
-                fontFamily: 'inherit',
-                transition: 'all 0.15s'
-              }}
+              <button
+                key={i}
+                onClick={() => sendMessage(q)}
+                style={{
+                  background: '#fff',
+                  border: '0.5px solid #B8BBE8',
+                  color: '#6366A8',
+                  borderRadius: '20px',
+                  padding: '5px 13px',
+                  fontSize: '12px',
+                  cursor: 'pointer',
+                  fontFamily: 'inherit',
+                  transition: 'all 0.15s'
+                }}
                 onMouseEnter={e => {
-                  e.target.style.background = '#EEEDFE';
-                  e.target.style.borderColor = '#534AB7';
+                  e.target.style.background = '#EEEEF7';
+                  e.target.style.borderColor = '#7B7FC4';
                 }}
                 onMouseLeave={e => {
                   e.target.style.background = '#fff';
-                  e.target.style.borderColor = '#AFA9EC';
+                  e.target.style.borderColor = '#B8BBE8';
                 }}
               >
                 {q}
@@ -287,7 +708,7 @@ export default function App() {
         <div style={{
           padding: '14px 20px',
           background: '#fff',
-          borderTop: '0.5px solid #CECBF6',
+          borderTop: '0.5px solid #C5C7E8',
           display: 'flex',
           gap: '10px',
           alignItems: 'flex-end'
@@ -306,7 +727,7 @@ export default function App() {
             rows={1}
             style={{
               flex: 1,
-              border: '0.5px solid #CECBF6',
+              border: '0.5px solid #C5C7E8',
               borderRadius: '10px',
               padding: '10px 14px',
               fontSize: '14px',
@@ -314,30 +735,37 @@ export default function App() {
               resize: 'none',
               minHeight: '42px',
               maxHeight: '120px',
-              background: '#F7F6FF',
+              background: '#F2F2F9',
               color: '#1a1a2e',
               outline: 'none',
               transition: 'border-color 0.15s',
               lineHeight: '1.5'
             }}
-            onFocus={e => e.target.style.borderColor = '#534AB7'}
-            onBlur={e => e.target.style.borderColor = '#CECBF6'}
+            onFocus={e => e.target.style.borderColor = '#7B7FC4'}
+            onBlur={e => e.target.style.borderColor = '#C5C7E8'}
           />
           <button
             onClick={() => sendMessage()}
             disabled={!input.trim() || isLoading}
             style={{
-              width: 42, height: 42,
+              width: 42,
+              height: 42,
               borderRadius: '10px',
-              background: input.trim() && !isLoading ? '#534AB7' : '#AFA9EC',
+              background: input.trim() && !isLoading ? '#7B7FC4' : '#B8BBE8',
               border: 'none',
               cursor: input.trim() && !isLoading ? 'pointer' : 'not-allowed',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
               flexShrink: 0,
               transition: 'background 0.15s, transform 0.1s'
             }}
-            onMouseEnter={e => { if (input.trim() && !isLoading) e.target.style.background = '#3C3489'; }}
-            onMouseLeave={e => { if (input.trim() && !isLoading) e.target.style.background = '#534AB7'; }}
+            onMouseEnter={e => {
+              if (input.trim() && !isLoading) e.currentTarget.style.background = '#6366A8';
+            }}
+            onMouseLeave={e => {
+              if (input.trim() && !isLoading) e.currentTarget.style.background = '#7B7FC4';
+            }}
             onMouseDown={e => e.currentTarget.style.transform = 'scale(0.95)'}
             onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
           >
@@ -356,7 +784,7 @@ export default function App() {
         body { margin: 0; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #CECBF6; border-radius: 2px; }
+        ::-webkit-scrollbar-thumb { background: #C5C7E8; border-radius: 2px; }
       `}</style>
     </div>
   );
