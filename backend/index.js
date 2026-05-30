@@ -15,7 +15,7 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // Load and parse Excel once at startup
 function loadExcelData() {
-    const filePath = path.join(__dirname, 'Mercedes_eSprinter_Countries_Combinations__2_.xlsx');
+    const filePath = path.join(__dirname, 'Mercedes_eSprinter_Countries_Combinations_final_Poc.xlsx');
     const workbook = XLSX.readFile(filePath);
   const summary = {};
 
